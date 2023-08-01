@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+#from django.contrib.messsages import constants as messages
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -43,8 +44,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
+    # 日記アプリ
     'diary.apps.DiaryConfig',
+    # 認証アプリ
+    'accounts.apps.AccountsConfig',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'django_bootstrap5',
 ]
 
 MIDDLEWARE = [
@@ -174,4 +181,54 @@ LOGGING = {
         },
     }
 }
+
+#MESSAGES_TAGS = {
+#    messages.ERROR: 'alert alert-danger',
+#    messages.WARNING: 'alert alert-warning',
+#    messages.SUCCES: 'alert alert-success',
+#    messages.INFO: 'alert alert-info',
+#}
+
+
+# 認証でデフォルトユーザーでなく、カスタムユーザーを参照するようになる
+AUTH_USER_MODEL = 'accounts.CustomUser'
+
+# django-allauthで利用するdjango.contrib.sitesを使うためにサイト認識用IDを設定
+SITE_ID = 1
+
+AUTHENTICATION_BACKENDS = (
+    #一般ユーザー（メールアドレス認証）
+    'allauth.account.auth_backends.AuthenticationBackend',
+
+    #管理サイト（ユーザー名認証）
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+#　メールアドレス認証に変更する設定
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_USERNAME_REQUIRED = False
+
+# サインアップにメールアドレスを利用する設定
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_EMAIL_REQUIRED = True
+
+# ログイン・ログアウト後の遷移先
+LOGIN_REDIRECT_URL = 'diary:diary_list'
+ACCOUNT_LOGOUT_REDIRECT_URL = 'account_login'
+
+# ログアウト押下後、一発でログアウトする設定
+ACCOUNT_LOGOUT_ON_GET = True
+
+# django-allauthが送信するメールの懸命に自動付与される窃盗時をブランクにする設定
+ACCOUNT_EMAIL_SUBJECT_PREFIX = ''
+
+# デフォルトのメール送信先を設定
+DEFAULT_FROM_EMAIL = os.environ.get('FROM_EMAIL')
+
+# 画像を配信するURLのホスト名
+MEDIA_URL = '/media/'
+
+
+
+
 
